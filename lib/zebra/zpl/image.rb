@@ -23,7 +23,7 @@ module Zebra
           image.monochrome
           image.resize(@size)
           image.extent "#{(image.width/8.0).round*8}x#{(image.height/8.0).round*8}"
-          ready_img = Labelary::Image.encode path: image.path, filename: 'logo.png', mime_type: 'image/png'
+          ready_img = Labelary::Image.encode path: image.path, filename: 'image.png', mime_type: 'image/png'
         end
         %(^FO#{x},#{y},#{ready_img})
       end

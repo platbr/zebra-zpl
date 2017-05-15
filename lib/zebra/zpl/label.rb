@@ -41,7 +41,12 @@ module Zebra
       end
 
       def dump_contents(io = STDOUT)
+        io << to_zpl
+      end
+
+      def to_zpl
         check_required_configurations
+        io = ''
         # Start format
         io << "^XA"
         # ^LL<label height in dots>,<space between labels in dots>

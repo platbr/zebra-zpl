@@ -8,6 +8,7 @@ module Zebra
       class InvalidScaleFactorError < StandardError; end
       class InvalidCorrectionLevelError < StandardError; end
 
+      attr_writer :width
       attr_reader :scale_factor, :correction_level
 
       def scale_factor=(value)
@@ -22,7 +23,7 @@ module Zebra
 
       def to_zpl
         check_attributes
-        ["b#{x}", y, "Q", "s#{scale_factor}", "e#{correction_level}", "\"#{data}\""].join(",")
+        %(^FO#{x},#{y}^BQN,2,#{scale_factor},#{correction_level}^FD#{data}^FS)
       end
 
       private

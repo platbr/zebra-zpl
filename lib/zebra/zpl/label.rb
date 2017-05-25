@@ -6,12 +6,14 @@ module Zebra
       class InvalidPrintSpeedError     < StandardError; end
       class InvalidPrintDensityError   < StandardError; end
       class PrintSpeedNotInformedError < StandardError; end
+      class InvalidZplVersionError < StandardError; end
 
       attr_writer :copies
       attr_reader :elements, :tempfile
-      attr_accessor :width, :length, :gap, :print_speed, :print_density
+      attr_accessor :width, :length, :gap, :print_speed, :print_density, :zpl_version
 
       def initialize(options = {})
+        @zpl_version = options[:zpl_version] || 1
         options.each_pair { |key, value| self.__send__("#{key}=", value) if self.respond_to?("#{key}=") }
         @elements = []
       end
@@ -31,12 +33,18 @@ module Zebra
         @print_density = d
       end
 
+      def zpl_version=(value)
+        raise InvalidZplVersionError unless [1, 2].include?(value.to_i)
+        @zpl_version = value
+      end
+
       def copies
         @copies || 1
       end
 
       def <<(element)
         element.width = self.width
+        element.zpl_version = self.zpl_version if element.respond_to?(:zpl_version)
         elements << element
       end
 

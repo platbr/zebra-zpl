@@ -55,6 +55,7 @@ module Zebra
       def to_zpl
         check_required_configurations
         io = ''
+        io << "^SZ#{zpl_version}"
         # Start format
         io << "^XA"
         # ^LL<label height in dots>,<space between labels in dots>

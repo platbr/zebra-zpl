@@ -30,7 +30,7 @@ module Zebra
       def to_zpl
         check_attributes
         return %(^FO#{x},#{y}^BQN,2,#{scale_factor},^FD#{correction_level},#{data}^FS) if @zpl_version == 1
-        return %(^FO#{x},#{y}^BQ,2,#{scale_factor}^FD#{correction_level},A,#{data}^FS) if @zpl_version == 2
+        return %(^FO#{x},#{y}^BQ,2,#{scale_factor}^FD#{correction_level}M,A,#{data}^FS) if @zpl_version == 2
       end
 
       private

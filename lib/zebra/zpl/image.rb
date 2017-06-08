@@ -15,17 +15,27 @@ module Zebra
         check_attributes
         cache_img_file = File.join(Rails.root, 'tmp', "zebra_zpl_img_#{Digest::SHA1.hexdigest(@data)}_#{@size}")
         if File.exist?(cache_img_file) && !File.zero?(cache_img_file)
-          prepared_img = File.binread(cache_img_file)
+          image = MiniMagick::Image.read(File.binread(cache_img_file))
         else
           image = MiniMagick::Image.read(@data)
           image.flatten
           image.colorspace 'gray'
           image.monochrome
           image.resize(@size)
-          image.extent "#{(image.width/8.0).round*8}x#{(image.height/8.0).round*8}"
-          prepared_img = Labelary::Image.encode path: image.path, filename: 'image.png', mime_type: 'image/png'
+          image.extent "#{(image.width/8.0).ceil*8}x#{(image.height/8.0).ceil*8}"
+          file = File.open(cache_img_file, 'w+')
+          file.binmode
+          file.write File.binread(image.path)
+          file.close
         end
-        %(^FO#{x},#{y},#{prepared_img})
+        
+        image_zpl = Labelary::Image.encode path: image.path, filename: 'image.png', mime_type: 'image/png'
+
+        if justification == Justification::CENTER
+          x = (@width - image.width)/2
+        end
+
+        %(^FO#{x},#{y},#{image_zpl})
       end
 
       private

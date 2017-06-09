@@ -16,24 +16,24 @@ module Zebra
         cache_img_path = File.join(Rails.root, 'tmp', "zebra_zpl_img_#{Digest::SHA1.hexdigest(@data)}_#{@size}")
 
         if File.exist?(cache_img_path) && !File.zero?(cache_img_path)
-          @file = MiniMagick::Image.new(cache_img_path)
+          @image = MiniMagick::Image.new(cache_img_path)
         else
-          image = MiniMagick::Image.read(@data)
-          image.flatten
-          image.colorspace 'gray'
-          image.monochrome
-          image.resize(@size)
-          image.extent "#{(image.width/8.0).ceil*8}x#{(image.height/8.0).ceil*8}"
+          @image = MiniMagick::Image.read(@data)
+          @image.flatten
+          @image.colorspace 'gray'
+          @image.monochrome
+          @image.resize(@size)
+          @image.extent "#{(@image.width/8.0).ceil*8}x#{(@image.height/8.0).ceil*8}"
           @file = File.open(cache_img_path, 'w+')
           @file.binmode
-          @file.write File.binread(image.path)
+          @file.write File.binread(@image.path)
           @file.close
         end
 
-        image_zpl = Labelary::Image.encode path: @file.path, filename: 'image.png', mime_type: 'image/png'
+        image_zpl = Labelary::Image.encode path: cache_img_path, filename: 'image.png', mime_type: 'image/png'
 
         if justification == Justification::CENTER
-          x = (@width - @file.width)/2
+          x = (@width - @image.width)/2
         end
 
         %(^FO#{x},#{y},#{image_zpl})
